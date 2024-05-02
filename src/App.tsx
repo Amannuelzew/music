@@ -106,31 +106,48 @@ Die for you`;
         >
           {/* prettier-ignore */}
           <>
-          <div className="flex justify-between mb-2 items-baseline p-1" >
-           <p className="cursor-pointer" onClick={()=>{
+          <div onClick={()=>{
             if(current.matches("player.playing"))
               playerSend({
                 type: "update",
                 time: 0.00,
               });
-           }}>...</p>
+           }} className="cursor-pointer flex justify-between mb-2 items-baseline p-1" >
+           <p >...</p>
            <span className="border rounded-md w-14 text-center ">0:00</span>
           </div>
             {lines.map((line,index)=>(
               index==state.context.line ?
-              <div className="flex justify-between mb-2 items-baseline p-1 bg-purple-500 rounded-sm" key={index}>
+              <div  onClick={()=>{
+                  if (
+                    state.context.lyrics[
+                      index
+                    ] !== undefined
+                  ) {
+                    playerSend({
+                      type: "update",
+                      time: state.context.lyrics[index],
+                    });
+                    send({ type: "move", line: index });
+                  }
+                      }
+                }className="cursor-pointer flex justify-between mb-2 items-baseline p-1 bg-purple-500 rounded-sm" key={index}>
                 <p  >{line}</p>
                 <span className="border rounded-md w-14 text-center ">
                   {state.context.lyrics[index]}</span>
               </div>:
                <div className="flex justify-between mb-2 p-1 items-baseline" key={index}>
                 <p className="cursor-pointer" onClick={()=>{
-                  if (state.context.lyrics[state.context.line] !== undefined){
-                        playerSend({
-                          type: "update",
-                          time: state.context.lyrics[index],
-                        })
-                        send({type:"move",line:index})
+                  if (
+                    state.context.lyrics[
+                      index
+                    ] !== undefined
+                  ) {
+                    playerSend({
+                      type: "update",
+                      time: state.context.lyrics[index],
+                    });
+                    send({ type: "move", line: index });
                   }
                       }
                 } >{line}</p>
@@ -150,13 +167,18 @@ Die for you`;
                 type: "up",
               });
               scroll(-1);
+              console.log(
+                state.context.lyrics[state.context.line],
+                "s",
+                state.context.line
+              );
               if (
-                state.context.line > 0 &&
+                state.context.line >= 0 &&
                 state.context.lyrics[state.context.line] !== undefined
               )
                 playerSend({
                   type: "update",
-                  time: state.context.lyrics[state.context.line - 1],
+                  time: state.context.lyrics[state.context.line],
                 });
             }}
             variant="outline"
