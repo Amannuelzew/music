@@ -20,7 +20,8 @@ export const musicMachine = setup({
           progress: number;
           remain: number;
           elapsed: number;
-        },
+        }
+      | { type: "update"; time: number },
   },
   actors: {
     loadMusic: fromPromise(async () => {
@@ -86,6 +87,10 @@ export const musicMachine = setup({
                 remain: ({ event }) => event.remain,
                 elapsed: ({ event }) => event.elapsed,
               }),
+            },
+            update: {
+              actions: ({ context, event }) =>
+                (context.audio.currentTime = event.time),
             },
           },
         },

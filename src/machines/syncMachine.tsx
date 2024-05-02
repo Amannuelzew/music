@@ -1,7 +1,6 @@
 import { assign, setup } from "xstate";
 
-const lyric = `...
-I'm findin' ways to articulate
+const lyric = `I'm findin' ways to articulate
 The feeling I'm goin' through
 I just can't say I don't love you
 'Cause I love you, yeah`;
@@ -13,51 +12,63 @@ for (let index = 0; index < list.length; index++) {
 export const machine = setup({
   types: {
     events: {} as
-      | { type: "move down"; time: number }
-      | { type: "move up"; time: number },
+      | { type: "down"; time: number }
+      | { type: "up" }
+      | { type: "move"; line: number },
   },
   actions: {
     mark: ({ context, event }) => {
-      context.lyrics[context.line] = event.time;
-      console.log(context.lyrics);
+      context.lyrics[context.line] = event.time.toFixed(2);
     },
   },
 }).createMachine({
   initial: "idle",
   context: {
-    line: 0,
+    line: -1,
     current: 0,
     lyrics: {},
   },
   states: {
     idle: {},
+    move: {
+      entry: assign({
+        line: ({ event }) => event.line,
+      }),
+      always: "idle",
+    },
     "move down": {
       entry: assign({
         line: ({ context }) => (context.line += 1),
       }),
-      target: "idle",
+      always: "mark",
     },
     mark: {
       entry: {
         type: "mark",
       },
-      target: "idle",
+      always: "idle",
     },
     "move up": {
-      entry: assign({
+      entry: ({ context }) => {
+        delete context.lyrics[context.line];
+      },
+      exit: assign({
         line: ({ context }) => (context.line -= 1),
       }),
-      target: "mark",
+      always: "idle",
     },
   },
   on: {
-    "move down": {
+    down: {
       guard: ({ context }) => context.line <= 71,
       target: ".move down",
     },
-    "move up": {
-      guard: ({ context }) => context.line >= 1,
+    up: {
+      guard: ({ context }) => context.line >= 0,
       target: ".move up",
+    },
+    move: {
+      target: ".move",
     },
   },
 });

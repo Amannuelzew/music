@@ -3,17 +3,14 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "./components/ui/button";
 import { ScrollArea } from "./components/ui/scroll-area";
-import { Badge } from "./components/ui/badge";
 import { useMachine } from "@xstate/react";
 import { machine } from "./machines/syncMachine";
 import { musicMachine } from "./machines/musicMachine";
 import { useRef } from "react";
 import { Player } from "./Player";
-import { createContext } from "react";
 
 function App() {
-  const lyric = `...
-I'm findin' ways to articulate
+  const lyric = `I'm findin' ways to articulate
 The feeling I'm goin' through
 I just can't say I don't love you
 'Cause I love you, yeah
@@ -89,10 +86,10 @@ Die for you`;
   const lines = lyric.split("\n");
   const [state, send] = useMachine(machine);
   const playerMachine = useMachine(musicMachine);
-  const [current] = playerMachine;
+  const [current, playerSend] = playerMachine;
   const ref = useRef(null);
   const scroll = (type: number) => {
-    ref.current!.children[1]!.scrollTop += 30 * type;
+    ref.current!.children[1]!.scrollTop += 40 * type;
   };
   return (
     <>
@@ -108,31 +105,59 @@ Die for you`;
           className="items-start h-[300px] w-[550px] rounded-md border p-4"
         >
           {/* prettier-ignore */}
-          <div className="grid grid-cols-3 space-y-2 justify-items-start">
-            
+          <>
+          <div className="flex justify-between mb-2 items-baseline p-1" >
+           <p className="cursor-pointer" onClick={()=>{
+            if(current.matches("player.playing"))
+              playerSend({
+                type: "update",
+                time: 0.00,
+              });
+           }}>...</p>
+           <span className="border rounded-md w-14 text-center ">0:00</span>
+          </div>
             {lines.map((line,index)=>(
               index==state.context.line ?
-              <>
-                <p  className="col-span-2 bg-purple-500 rounded-sm">{line}</p>
-                <Badge variant="outline" className="ml-28 text-center">Badge</Badge>
-              </>:
-               <>
-                <p className="col-span-2 ">{line}</p>
-                <Badge variant="outline" className="ml-28 text-center">Badge</Badge>
-              </>
+              <div className="flex justify-between mb-2 items-baseline p-1 bg-purple-500 rounded-sm" key={index}>
+                <p  >{line}</p>
+                <span className="border rounded-md w-14 text-center ">
+                  {state.context.lyrics[index]}</span>
+              </div>:
+               <div className="flex justify-between mb-2 p-1 items-baseline" key={index}>
+                <p className="cursor-pointer" onClick={()=>{
+                  if (state.context.lyrics[state.context.line] !== undefined){
+                        playerSend({
+                          type: "update",
+                          time: state.context.lyrics[index],
+                        })
+                        send({type:"move",line:index})
+                  }
+                      }
+                } >{line}</p>
+                <span  className="border rounded-md w-14 text-center"> 
+                {state.context.lyrics[index]}</span>
+              </div>
             ) ) }
             {}
          
-          </div>
+          </>
         </ScrollArea>
         <div className="flex gap-4 my-4">
           <Button
+            disabled={!current.matches("player.playing")}
             onClick={() => {
               send({
-                type: "move up",
-                time: current.context.audio.currentTime,
+                type: "up",
               });
               scroll(-1);
+              if (
+                state.context.line > 0 &&
+                state.context.lyrics[state.context.line] !== undefined
+              )
+                playerSend({
+                  type: "update",
+                  time: state.context.lyrics[state.context.line - 1],
+                });
             }}
             variant="outline"
             size="icon"
@@ -140,9 +165,10 @@ Die for you`;
             <ChevronUp className="h-4 w-4" />
           </Button>
           <Button
+            disabled={!current.matches("player.playing")}
             onClick={() => {
               send({
-                type: "move down",
+                type: "down",
                 time: current.context.audio.currentTime,
               });
               scroll(1);
