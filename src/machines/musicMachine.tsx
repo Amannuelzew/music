@@ -12,17 +12,44 @@ const load = () => {
 
 export const machine = setup({
   types: {
-    events: {} as { type: "play" } | { type: "pause" },
+    events: {} as
+      | { type: "play" }
+      | { type: "pause" }
+      | {
+          type: "update progress";
+          progress: number;
+          remain: number;
+          elapsed: number;
+        },
   },
   actors: {
     loadMusic: fromPromise(async () => {
       return load().then((res) => res);
+    }),
+    updateProgress: fromCallback(({ input, sendBack }) => {
+      input.audio.ontimeupdate = (event) => {
+        let r = input.audio.duration - input.audio.currentTime;
+        let e = input.audio.currentTime;
+        sendBack({
+          type: "update progress",
+          progress: (event.target.currentTime * 100) / event.target.duration,
+          remain: `-${Math.floor(r / 60)}:${
+            Math.round(r % 60) < 10 ? "0" : ""
+          }${Math.round(r % 60) == 60 ? "59" : Math.round(r % 60)}`,
+          elapsed: `${Math.floor(e / 60)}:${
+            Math.round(e % 60) < 10 ? "0" : ""
+          }${Math.round(e % 60) == 60 ? "59" : Math.round(e % 60)}`,
+        });
+      };
     }),
   },
 }).createMachine({
   initial: "loading",
   context: {
     audio: null,
+    remain: 0,
+    elapsed: 0,
+    progress: 0,
   },
   states: {
     loading: {
@@ -43,9 +70,22 @@ export const machine = setup({
       initial: "paused",
       states: {
         playing: {
+          invoke: {
+            src: "updateProgress",
+            input: ({ context }) => ({
+              audio: context.audio,
+            }),
+          },
           on: {
             pause: {
               target: "paused",
+            },
+            "update progress": {
+              actions: assign({
+                progress: ({ event }) => event.progress,
+                remain: ({ event }) => event.remain,
+                elapsed: ({ event }) => event.elapsed,
+              }),
             },
           },
         },

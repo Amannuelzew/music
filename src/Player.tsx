@@ -9,6 +9,7 @@ export const Player = () => {
     <>
       <div className="flex">
         <h1>{JSON.stringify(state.value)}</h1>
+        <p>{state.context.elapsed}</p>
         {state.matches("loading") ? (
           <Button onClick={() => {}} variant="outline" size="icon">
             <LoaderIcon />
@@ -34,6 +35,7 @@ export const Player = () => {
             <PauseIcon />
           </Button>
         )}
+        <p>{state.context.remain}</p>
       </div>
     </>
   );
