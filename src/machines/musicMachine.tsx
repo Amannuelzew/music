@@ -10,7 +10,7 @@ const load = () => {
   });
 };
 
-export const machine = setup({
+export const musicMachine = setup({
   types: {
     events: {} as
       | { type: "play" }

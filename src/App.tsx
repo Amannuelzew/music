@@ -6,9 +6,10 @@ import { ScrollArea } from "./components/ui/scroll-area";
 import { Badge } from "./components/ui/badge";
 import { useMachine } from "@xstate/react";
 import { machine } from "./machines/syncMachine";
-
+import { musicMachine } from "./machines/musicMachine";
 import { useRef } from "react";
 import { Player } from "./Player";
+import { createContext } from "react";
 
 function App() {
   const lyric = `...
@@ -87,7 +88,8 @@ Baby I would die for you, yeah babe
 Die for you`;
   const lines = lyric.split("\n");
   const [state, send] = useMachine(machine);
-
+  const playerMachine = useMachine(musicMachine);
+  const [current] = playerMachine;
   const ref = useRef(null);
   const scroll = (type: number) => {
     ref.current!.children[1]!.scrollTop += 30 * type;
@@ -96,10 +98,11 @@ Die for you`;
     <>
       <div className="grid max-w-xl mx-auto  rounded-md shadow-sm p-4">
         <h1 className="text-2xl">
-          {state.value}
+          {JSON.stringify(state.value)}
           {state.context.line}
         </h1>
-        <Player />
+        <Player machine={playerMachine} />
+
         <ScrollArea
           ref={ref}
           className="items-start h-[300px] w-[550px] rounded-md border p-4"
@@ -125,7 +128,10 @@ Die for you`;
         <div className="flex gap-4 my-4">
           <Button
             onClick={() => {
-              send({ type: "move up" });
+              send({
+                type: "move up",
+                time: current.context.audio.currentTime,
+              });
               scroll(-1);
             }}
             variant="outline"
@@ -135,8 +141,10 @@ Die for you`;
           </Button>
           <Button
             onClick={() => {
-              send({ type: "move down" });
-              send({ type: "mark", time: 23 });
+              send({
+                type: "move down",
+                time: current.context.audio.currentTime,
+              });
               scroll(1);
             }}
             variant="outline"

@@ -1,10 +1,10 @@
-import { useMachine } from "@xstate/react";
-import { machine } from "./machines/musicMachine";
+//import { useMachine } from "@xstate/react";
+//import { musicmachine } from "./machines/musicMachine";
 import { Button } from "./components/ui/button";
 import { LoaderIcon, PauseIcon, PlayIcon } from "lucide-react";
 
-export const Player = () => {
-  const [state, send] = useMachine(machine);
+export const Player = ({ machine }) => {
+  const [state, send] = machine;
   return (
     <>
       <div className="flex">

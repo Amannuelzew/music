@@ -13,9 +13,8 @@ for (let index = 0; index < list.length; index++) {
 export const machine = setup({
   types: {
     events: {} as
-      | { type: "move down" }
-      | { type: "move up" }
-      | { type: "mark"; time: number },
+      | { type: "move down"; time: number }
+      | { type: "move up"; time: number },
   },
   actions: {
     mark: ({ context, event }) => {
@@ -37,12 +36,6 @@ export const machine = setup({
         line: ({ context }) => (context.line += 1),
       }),
       target: "idle",
-      on: {
-        mark: {
-          guard: ({ context }) => context.line > 1,
-          target: "mark",
-        },
-      },
     },
     mark: {
       entry: {
@@ -54,7 +47,7 @@ export const machine = setup({
       entry: assign({
         line: ({ context }) => (context.line -= 1),
       }),
-      target: "idle",
+      target: "mark",
     },
   },
   on: {
