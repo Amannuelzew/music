@@ -5,6 +5,7 @@ import { LoaderIcon, PauseIcon, PlayIcon } from "lucide-react";
 
 export const Player = ({ machine }) => {
   const [state, send] = machine;
+  window.audio = state.context.audio;
   return (
     <>
       <div className="flex">

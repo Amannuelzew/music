@@ -120,9 +120,8 @@ Die for you`;
               index==state.context.line ?
               <div  onClick={()=>{
                   if (
-                    state.context.lyrics[
-                      index
-                    ] !== undefined
+                    state.context.lyrics[index] !== undefined &&
+                    current.matches("player.playing")
                   ) {
                     playerSend({
                       type: "update",
@@ -139,9 +138,8 @@ Die for you`;
                <div className="flex justify-between mb-2 p-1 items-baseline" key={index}>
                 <p className="cursor-pointer" onClick={()=>{
                   if (
-                    state.context.lyrics[
-                      index
-                    ] !== undefined
+                    state.context.lyrics[index] !== undefined &&
+                    current.matches("player.playing")
                   ) {
                     playerSend({
                       type: "update",

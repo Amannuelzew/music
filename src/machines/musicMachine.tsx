@@ -28,7 +28,11 @@ export const musicMachine = setup({
       return load().then((res) => res);
     }),
     updateProgress: fromCallback(({ input, sendBack }) => {
+      //update progress,remian,elapsed on update
       input.audio.ontimeupdate = (event) => {
+        //change state to paused when the audio finsh
+        if (input.audio.duration == input.audio.currentTime)
+          sendBack({ type: "pause" });
         let r = input.audio.duration - input.audio.currentTime;
         let e = input.audio.currentTime;
         sendBack({
