@@ -98,7 +98,7 @@ Die for you`;
         {/* prettier-ignore */}
         <>
           <div onClick={()=>{
-            if(current.matches("player.playing"))
+            if(current.matches("ready.player.playing"))
               playerSend({
                 type: "update",
                 time: 0.00,
@@ -112,7 +112,7 @@ Die for you`;
               <div  onClick={()=>{
                   if (
                     state.context.lyrics[index] !== undefined &&
-                    current.matches("player.playing")
+                    current.matches("ready.player.playing")
                   ) {
                     playerSend({
                       type: "update",
@@ -130,7 +130,7 @@ Die for you`;
                 <p className="cursor-pointer" onClick={()=>{
                   if (
                     state.context.lyrics[index] !== undefined &&
-                    current.matches("player.playing")
+                    current.matches("ready.player.playing")
                   ) {
                     playerSend({
                       type: "update",
@@ -150,7 +150,7 @@ Die for you`;
       </ScrollArea>
       <div className="flex gap-4 my-4">
         <Button
-          disabled={!current.matches("player.playing")}
+          disabled={!current.matches("ready.player.playing")}
           onClick={() => {
             send({
               type: "up",
@@ -171,7 +171,7 @@ Die for you`;
           <ChevronUp className="h-4 w-4" />
         </Button>
         <Button
-          disabled={!current.matches("player.playing")}
+          disabled={!current.matches("ready.player.playing")}
           onClick={() => {
             send({
               type: "down",

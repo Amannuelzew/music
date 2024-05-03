@@ -3,14 +3,15 @@
 import { Button } from "./components/ui/button";
 import { LoaderIcon, PauseIcon, PlayIcon } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
-export const Player = ({ machine }) => {
+export const Player = ({ machine, lrcMachine }) => {
   const [state, send] = machine;
+  const [stateLrc, sendLrc] = lrcMachine;
   window.audioRef = state.context.audioRef;
   return (
     <>
       <h1>{JSON.stringify(state.value)}</h1>
       <div className="space-y-2 mb-1">
-        {state.matches("player") && (
+        {state.matches("ready.player") && (
           <>
             <div className="flex gap-4 items-center space-y-2">
               <p>{state.context.elapsed}</p>
@@ -41,7 +42,7 @@ export const Player = ({ machine }) => {
           <Button onClick={() => {}} variant="outline" size="icon">
             <LoaderIcon />
           </Button>
-        ) : state.matches("player.paused") ? (
+        ) : state.matches("ready.player.paused") ? (
           <Button
             onClick={() => {
               send({ type: "play" });
