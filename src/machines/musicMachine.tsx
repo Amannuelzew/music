@@ -5,6 +5,7 @@ const load = () => {
     const audio = new Audio();
     audio.src = "./TheWeeknd.mp3";
     audio.preload = "auto";
+    audio.volume = 0.2;
     audio.oncanplaythrough = resolve(audio);
     audio.onerror = reject(audio);
   });
@@ -21,20 +22,21 @@ export const musicMachine = setup({
           remain: number;
           elapsed: number;
         }
-      | { type: "update"; time: number },
+      | { type: "update"; time: number }
+      | { type: "update volume"; volume: number },
   },
   actors: {
     loadMusic: fromPromise(async () => {
-      return load().then((res) => res);
+      return await load().then((res) => res);
     }),
     updateProgress: fromCallback(({ input, sendBack }) => {
       //update progress,remian,elapsed on update
-      input.audio.ontimeupdate = (event) => {
-        //change state to paused when the audio finsh
-        if (input.audio.duration == input.audio.currentTime)
+      input.audioRef.ontimeupdate = (event) => {
+        //change state to paused when the audioRef finsh
+        if (input.audioRef.duration == input.audioRef.currentTime)
           sendBack({ type: "pause" });
-        let r = input.audio.duration - input.audio.currentTime;
-        let e = input.audio.currentTime;
+        const r = input.audioRef.duration - input.audioRef.currentTime;
+        const e = input.audioRef.currentTime;
         sendBack({
           type: "update progress",
           progress: (event.target.currentTime * 100) / event.target.duration,
@@ -48,13 +50,20 @@ export const musicMachine = setup({
       };
     }),
   },
+  actions: {
+    volume: ({ context, event }) => {
+      context.audioRef.volume = event.volume;
+    },
+  },
 }).createMachine({
   initial: "loading",
   context: {
-    audio: null,
-    remain: 0,
-    elapsed: 0,
+    audioRef: null,
+    remain: "",
+    elapsed: "0:00",
     progress: 0,
+    duration: 0,
+    volume: 0.2,
   },
   states: {
     loading: {
@@ -62,7 +71,12 @@ export const musicMachine = setup({
         src: "loadMusic",
         onDone: {
           actions: assign({
-            audio: ({ event }) => event.output,
+            audioRef: ({ event }) => event.output,
+            duration: ({ event }) => event.output!.duration,
+            remain: ({ event }) =>
+              `-${Math.floor(event.output!.duration / 60)}:${Math.round(
+                event.output!.duration % 60
+              )}`,
           }),
           target: "player",
         },
@@ -78,34 +92,52 @@ export const musicMachine = setup({
           invoke: {
             src: "updateProgress",
             input: ({ context }) => ({
-              audio: context.audio,
+              audioRef: context.audioRef,
             }),
           },
           on: {
             pause: {
               target: "paused",
             },
-            "update progress": {
-              actions: assign({
-                progress: ({ event }) => event.progress,
-                remain: ({ event }) => event.remain,
-                elapsed: ({ event }) => event.elapsed,
-              }),
-            },
-            update: {
-              actions: ({ context, event }) =>
-                (context.audio.currentTime = event.time),
-            },
           },
         },
         paused: {
-          entry: ({ context }) => context.audio.pause(),
-          exit: ({ context }) => context.audio.play(),
+          invoke: {
+            src: "updateProgress",
+            input: ({ context }) => ({
+              audioRef: context.audioRef,
+            }),
+          },
+          entry: ({ context }) => context.audioRef.pause(),
+          exit: ({ context }) => context.audioRef.play(),
           on: {
             play: {
               target: "playing",
             },
           },
+        },
+      },
+      on: {
+        "update progress": {
+          actions: assign({
+            progress: ({ event }) => event.progress,
+            remain: ({ event }) => event.remain,
+            elapsed: ({ event }) => event.elapsed,
+          }),
+        },
+        update: {
+          actions: ({ context, event }) =>
+            (context.audioRef.currentTime = event.time),
+        },
+        "update volume": {
+          actions: [
+            assign({
+              volume: ({ event }) => event.volume,
+            }),
+            {
+              type: "volume",
+            },
+          ],
         },
       },
     },

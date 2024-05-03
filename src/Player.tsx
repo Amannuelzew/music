@@ -2,15 +2,41 @@
 //import { musicmachine } from "./machines/musicMachine";
 import { Button } from "./components/ui/button";
 import { LoaderIcon, PauseIcon, PlayIcon } from "lucide-react";
-
+import { Slider } from "@/components/ui/slider";
 export const Player = ({ machine }) => {
   const [state, send] = machine;
-  window.audio = state.context.audio;
+  window.audioRef = state.context.audioRef;
   return (
     <>
-      <div className="flex">
-        <h1>{JSON.stringify(state.value)}</h1>
-        <p>{state.context.elapsed}</p>
+      <h1>{JSON.stringify(state.value)}</h1>
+      <div>
+        {state.matches("player") && (
+          <>
+            <div className="flex gap-4 items-center">
+              <p>{state.context.elapsed}</p>
+              <Slider
+                defaultValue={[0]}
+                onValueChange={(event) => {
+                  send({ type: "update", time: event[0] });
+                }}
+                value={[state.context.audioRef.currentTime]}
+                max={258.77}
+                className="w-[60%]"
+              />
+              <p>{state.context.remain}</p>
+            </div>
+            <Slider
+              defaultValue={[0.2]}
+              onValueChange={(event) => {
+                send({ type: "update volume", volume: event[0] });
+              }}
+              value={[state.context.volume]}
+              step={0.1}
+              max={1}
+              className="w-[60%]"
+            />
+          </>
+        )}
         {state.matches("loading") ? (
           <Button onClick={() => {}} variant="outline" size="icon">
             <LoaderIcon />
@@ -36,7 +62,6 @@ export const Player = ({ machine }) => {
             <PauseIcon />
           </Button>
         )}
-        <p>{state.context.remain}</p>
       </div>
     </>
   );
