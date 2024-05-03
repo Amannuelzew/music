@@ -9,10 +9,10 @@ export const Player = ({ machine }) => {
   return (
     <>
       <h1>{JSON.stringify(state.value)}</h1>
-      <div>
+      <div className="space-y-2 mb-1">
         {state.matches("player") && (
           <>
-            <div className="flex gap-4 items-center">
+            <div className="flex gap-4 items-center space-y-2">
               <p>{state.context.elapsed}</p>
               <Slider
                 defaultValue={[0]}
