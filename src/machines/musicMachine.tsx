@@ -56,15 +56,21 @@ export const musicMachine = setup({
     }),
     synchronize: fromCallback(({ input, sendBack }) => {
       input.lrc.on("sync", (line) => {
-        sendBack({ type: "update line", line: line.text });
+        sendBack({ type: "update line", line: line });
       });
     }),
   },
   actions: {
-    volume: ({ context, event }) => {
+    volume: ({
+      context,
+      event,
+    }: {
+      context: { audioRef: HTMLAudioElement };
+      event: { volume: number };
+    }) => {
       context.audioRef.volume = event.volume;
     },
-    sync: ({ context }, params) => {
+    sync: ({ context }, params: { current: number }) => {
       context.lrc.sync(params.current, false);
     },
   },
@@ -244,7 +250,7 @@ export const musicMachine = setup({
             sync: {
               actions: {
                 type: "sync",
-                params: ({ event }) => ({
+                params: ({ event }: { event: { current: number } }) => ({
                   current: event.current,
                 }),
               },

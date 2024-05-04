@@ -1,11 +1,8 @@
-//import { useMachine } from "@xstate/react";
-//import { musicmachine } from "./machines/musicMachine";
 import { Button } from "./components/ui/button";
 import { LoaderIcon, PauseIcon, PlayIcon } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
-export const Player = ({ machine, lrcMachine }) => {
+export const Player = ({ machine }) => {
   const [state, send] = machine;
-  const [stateLrc, sendLrc] = lrcMachine;
   window.audioRef = state.context.audioRef;
   return (
     <>
