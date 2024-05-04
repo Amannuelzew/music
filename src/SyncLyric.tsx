@@ -87,13 +87,13 @@ Die for you`;
   };
   return (
     <>
-      <h1 className="text-2xl">
+      <h1>
         {JSON.stringify(state.value)}
         {state.context.line}
       </h1>
       <ScrollArea
         ref={ref}
-        className="items-start h-[300px] w-[550px] rounded-md border p-4"
+        className="items-start h-[250px] w-[550px] rounded-md border p-4"
       >
         {/* prettier-ignore */}
         <>
@@ -183,6 +183,14 @@ Die for you`;
           size="icon"
         >
           <ChevronDown className="h-4 w-4" />
+        </Button>
+        <Button
+          // disabled={!state.can("submit")}
+          onClick={() => {
+            send({ type: "submit" });
+          }}
+        >
+          submit
         </Button>
       </div>
     </>
