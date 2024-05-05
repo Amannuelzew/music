@@ -93,7 +93,7 @@ Die for you`;
       </h1>
       <ScrollArea
         ref={ref}
-        className="items-start h-[250px] w-[550px] rounded-md border p-4"
+        className="items-start h-[250px]  rounded-md border p-4"
       >
         {/* prettier-ignore */}
         <>

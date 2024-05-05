@@ -31,7 +31,7 @@ export const Player = ({ machine }) => {
               value={[state.context.volume]}
               step={0.1}
               max={1}
-              className="w-[60%]"
+              className="w-[60%] hidden md:flex"
             />
           </>
         )}

@@ -76,6 +76,14 @@ let lrc = {};
 for (let index = 0; index < list.length; index++) {
   lrc[index] = list[index];
 }
+const header = `[ar:Lyrics artist]
+[al:Album where the song is from]
+[ti:Lyrics (song) title]
+[au:Creator of the Songtext]
+[length:How long the song is]
+[by:Creator of the LRC file]
+[re:The player or editor that created the LRC file]
+[ve:version of program]`;
 const convert = (time: string): string => {
   const t = parseFloat(time);
   return `${Math.floor(t / 60) < 10 ? 0 : ""}${Math.floor(t / 60)}:${(
@@ -92,15 +100,16 @@ export const machine = setup({
   },
   actions: {
     mark: ({ context, event }) => {
-      context.lyrics[context.line] = event.time.toFixed(2);
+      context.timestamp.push(event.time.toFixed(2));
     },
     submit: ({ context }) => {
       //check(validate) the lyric synchronization
       //change its format to lrc
       //[00:28.76]I'm findin' ways to articulate
       //{"0":"1.30"}
-      for (let index = 0; index < list.length; index++) {
-        console.log(`[${convert(context.lyrics[index])}]${list[index]}`);
+      console.log(header);
+      for (let index = 0; index < context.timestamp.length; index++) {
+        console.log(`[${convert(context.timestamp[index])}]${list[index]}`);
       }
     },
   },
@@ -109,7 +118,7 @@ export const machine = setup({
   context: {
     line: -1,
     current: 0,
-    lyrics: {},
+    timestamp: [],
   },
   states: {
     idle: {},
@@ -127,7 +136,7 @@ export const machine = setup({
     },
     "move up": {
       entry: ({ context }) => {
-        delete context.lyrics[context.line];
+        context.timestamp.pop();
       },
       exit: assign({
         line: ({ context }) => (context.line -= 1),
