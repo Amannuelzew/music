@@ -111,12 +111,12 @@ Die for you`;
               index==state.context.line ?
               <div  onClick={()=>{
                   if (
-                    state.context.lyrics[index] !== undefined &&
+                    state.context.timestamp[index] !== undefined &&
                     current.matches("ready.player.playing")
                   ) {
                     playerSend({
                       type: "update",
-                      time: state.context.lyrics[index],
+                      time: state.context.timestamp[index],
                     });
                     send({ type: "move", line: index });
                   }
@@ -124,24 +124,24 @@ Die for you`;
                 }className="cursor-pointer flex justify-between mb-2 items-baseline p-1 bg-purple-500 rounded-sm" key={index}>
                 <p  >{line}</p>
                 <span className="border rounded-md w-14 text-center ">
-                  {state.context.lyrics[index]}</span>
+                  {state.context.timestamp[index]}</span>
               </div>:
                <div className="flex justify-between mb-2 p-1 items-baseline" key={index}>
                 <p className="cursor-pointer" onClick={()=>{
                   if (
-                    state.context.lyrics[index] !== undefined &&
+                    state.context.timestamp[index] !== undefined &&
                     current.matches("ready.player.playing")
                   ) {
                     playerSend({
                       type: "update",
-                      time: state.context.lyrics[index],
+                      time: state.context.timestamp[index],
                     });
                     send({ type: "move", line: index });
                   }
                       }
                 } >{line}</p>
                 <span  className="border rounded-md w-14 text-center"> 
-                {state.context.lyrics[index]}</span>
+                {state.context.timestamp[index]}</span>
               </div>
             ) ) }
             {}
@@ -158,11 +158,11 @@ Die for you`;
             scroll(-1);
             if (
               state.context.line >= 0 &&
-              state.context.lyrics[state.context.line] !== undefined
+              state.context.timestamp[state.context.line] !== undefined
             )
               playerSend({
                 type: "update",
-                time: state.context.lyrics[state.context.line],
+                time: state.context.timestamp[state.context.line],
               });
           }}
           variant="outline"
